@@ -12,7 +12,7 @@ import AnimatedLoader from "react-native-animated-loader";
 
 export default class SignInScreen extends React.Component {
     static navigationOptions = {
-      title: 'Mandiri Edu Mobile',
+      title: 'Education Mobile',
     };
 
     constructor(props){
@@ -26,7 +26,6 @@ export default class SignInScreen extends React.Component {
           userid: '1401001',
           password: '03081996',
       }
-      
     }
 
     showLoader = () => {
@@ -47,7 +46,7 @@ export default class SignInScreen extends React.Component {
           method: 'POST',
           headers: {
               'Accept': 'application/json',
-              'SECRETKEY': 'ddbfec18dd48fddc8ccbf59469a69746',
+              'SECRETKEY': global.Variable.SECRET_KEY,
               'Content-Type': 'multipart/form-data',
               'X-Requested-With': 'XMLHttpRequest',
           },
@@ -61,11 +60,10 @@ export default class SignInScreen extends React.Component {
               dataSource: responseJSON,
           });
           //await AsyncStorage.setItem('access_token', responseJSON.access_token);
-          if(responseJSON.message == "Success")
-          {
+          if(responseJSON.message == "Success"){
+            global.Variable.AUTH = responseJSON.data;
             this.props.navigation.navigate('Main');
-          }else
-          {
+          }else{
             Alert.alert(responseJSON.message);
           }
           this.hideLoader();
@@ -98,8 +96,9 @@ export default class SignInScreen extends React.Component {
             <TouchableWithoutFeedback style={styles.container} onPress={Keyboard.dismiss}>
               <View style={styles.container}>
                 <View style={styles.logoContainer}>
-                  <Image style={styles.logo} source={require('../images/appicon.png')}/>
-                  <Text style={styles.title}>Mandiri Edu Mobile</Text>             
+                  <Image style={styles.logo} source={require('../images/appicon.gif')}/>
+                  <Text style={styles.title}>Education Mobile</Text>       
+                  <Text style={styles.title2}>Supported by Bank Mandiri</Text>             
                 </View>
                 <AnimatedLoader
                   visible={true}
@@ -122,8 +121,9 @@ export default class SignInScreen extends React.Component {
             <TouchableWithoutFeedback style={styles.container} onPress={Keyboard.dismiss}>
               <View style={styles.container}>
                 <View style={styles.logoContainer}>
-                  <Image style={styles.logo} source={require('../images/appicon.png')}/>
-                  <Text style={styles.title}>Mandiri Edu Mobile</Text>             
+                  <Image style={styles.logo} source={require('../images/appicon.gif')}/>
+                  <Text style={styles.title}>Education Mobile</Text>       
+                  <Text style={styles.title2}>Supported by Bank Mandiri</Text>         
                 </View>
 
                 <View style={styles.infoContainer}>
@@ -178,13 +178,18 @@ const styles = StyleSheet.create({
     flex:1
   },
   logo:{
-    width:128,
-    height:56,
+    width:256,
+    height:112,
     resizeMode: 'contain'
   },
   title:{
     color: '#f7c744',
-    fontSize: 16,
+    fontSize: 26,
+    textAlign: 'center'
+  },
+  title2:{
+    color: '#459EDA',
+    fontSize: 12,
     textAlign: 'center'
   },
   infoContainer:{
@@ -205,7 +210,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   buttonContainer:{
-    backgroundColor: '#10178C',
+    backgroundColor: '#459EDA',
     paddingVertical: 15
   },
   buttonText:{

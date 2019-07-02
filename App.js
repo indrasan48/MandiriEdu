@@ -1,6 +1,9 @@
 import React from 'react';
 import { Platform, StatusBar, StyleSheet, View, Alert,BackHandler , PermissionsAndroid, PermissionAwareActivity, Text, Button} from 'react-native';
-import { AppLoading, Asset, Font, Icon } from 'expo';
+import { AppLoading } from 'expo';
+import { Asset } from 'expo-asset';
+import * as Font from 'expo-font';
+import * as Icon from '@expo/vector-icons'
 import AppNavigator from './navigation/AppNavigator';
 import Global from './constants/Global';
 import UserInactivity from 'react-native-user-inactivity';
