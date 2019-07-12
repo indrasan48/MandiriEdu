@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   FlatList,
   TextInput,
+  Image,
 } from 'react-native';
 import * as Icon from '@expo/vector-icons'
 import AnimatedLoader from "react-native-animated-loader";
@@ -107,12 +108,18 @@ export default class DataTaruna extends React.Component {
     return (
       <View style={styles.container}>
       <View style={styles.headerrow}>
-        <Icon.Ionicons name={Platform.OS === 'ios' ? 'ios-person' : 'md-person'} size={48} color='white'/>
         <Text style={styles.headerText}>
           Data Taruna
         </Text>
       </View>
       <View style={styles.bodyrow}>
+
+        <View style={styles.containerLogo}>
+          <Image
+            style={{width: 200, height: 200}}
+            source={require('../images/profile.png')} 
+          />
+        </View>
         {(this.state.data) &&
           <CustomListview
             itemList={this.state.data}
@@ -128,7 +135,7 @@ export default class DataTaruna extends React.Component {
   }
 
   _signOutAsync = async () => {
-    await AsyncStorage.clear();
+    //await AsyncStorage.clear();
     this.props.navigation.navigate('Auth');
   };
 
@@ -140,6 +147,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     marginTop:23,
   }, 
+  containerLogo: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   headerrow: {
     flex: 1,
     backgroundColor: Colors.defaultBackground,

@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, Image, TouchableWithoutFeedback,
     Button, StatusBar, TextInput,
     AsyncStorage, SafeAreaView, Keyboard,
-    View, TouchableOpacity, KeyboardAvoidingView,
+    View, TouchableOpacity, KeyboardAvoidingView, ImageBackground,
     StyleSheet, position, Alert, ActivityIndicator, PermissionsAndroid
 } from 'react-native';
 import FormData from 'FormData';
@@ -94,6 +94,7 @@ export default class SignInScreen extends React.Component {
             <StatusBar barStyle="light-content"/>
             <KeyboardAvoidingView behavior='padding' style={styles.container}>
             <TouchableWithoutFeedback style={styles.container} onPress={Keyboard.dismiss}>
+              <ImageBackground source={require('../images/background.jpeg')} style={styles.backgroundImage} >
               <View style={styles.container}>
                 <View style={styles.logoContainer}>
                   <Image style={styles.logo} source={require('../images/appicon.gif')}/>
@@ -108,6 +109,7 @@ export default class SignInScreen extends React.Component {
                   speed={1}
                 />
               </View>
+              </ImageBackground>
               </TouchableWithoutFeedback>
             </KeyboardAvoidingView>
 
@@ -119,6 +121,7 @@ export default class SignInScreen extends React.Component {
             <StatusBar barStyle="light-content"/>
             <KeyboardAvoidingView behavior='padding' style={styles.container}>
             <TouchableWithoutFeedback style={styles.container} onPress={Keyboard.dismiss}>
+            <ImageBackground source={require('../images/background.jpeg')} style={styles.backgroundImage} >
               <View style={styles.container}>
                 <View style={styles.logoContainer}>
                   <Image style={styles.logo} source={require('../images/appicon.gif')}/>
@@ -129,7 +132,7 @@ export default class SignInScreen extends React.Component {
                 <View style={styles.infoContainer}>
                     <TextInput style={styles.input} 
                         placeholder="Userid"
-                        placeholderTextColor='rgba(255,255,255,0.8)'
+                        placeholderTextColor='black'
                         keyboardType='number-pad'
                         returnKeyType='next'
                         autoCorrect={false}
@@ -139,7 +142,7 @@ export default class SignInScreen extends React.Component {
 
                     <TextInput style={styles.input} 
                         placeholder="Password"
-                        placeholderTextColor='rgba(255,255,255,0.8)'
+                        placeholderTextColor='black'
                         keyboardType='default'
                         secureTextEntry={true}
                         autoCorrect={false}
@@ -152,6 +155,7 @@ export default class SignInScreen extends React.Component {
                     </TouchableOpacity>
                 </View>
               </View>
+              </ImageBackground>
               </TouchableWithoutFeedback>
             </KeyboardAvoidingView>
 
@@ -171,6 +175,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white',
     flexDirection: 'column',
+    backgroundColor: 'transparent',
   },
   logoContainer:{
     alignItems: 'center',
@@ -185,12 +190,22 @@ const styles = StyleSheet.create({
   title:{
     color: '#f7c744',
     fontSize: 26,
-    textAlign: 'center'
+    textAlign: 'center',
+    shadowColor: '#f00',
+    shadowOffset: { width: 1, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 3,
+    elevation: 3,
   },
   title2:{
     color: '#459EDA',
     fontSize: 12,
-    textAlign: 'center'
+    textAlign: 'center',
+    shadowColor: '#f00',
+    shadowOffset: { width: 1, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 3,
+    elevation: 3,
   },
   infoContainer:{
     position: 'absolute',
@@ -208,10 +223,20 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderColor: '#000',
     borderWidth: 1,
+    shadowColor: '#f00',
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 1,
+    shadowRadius: 5,
+    elevation: 3,
   },
   buttonContainer:{
     backgroundColor: '#459EDA',
-    paddingVertical: 15
+    paddingVertical: 15,
+    shadowColor: '#f00',
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 1,
+    shadowRadius: 5,
+    elevation: 3,
   },
   buttonText:{
     textAlign: 'center',
@@ -222,5 +247,11 @@ const styles = StyleSheet.create({
   lottie: {
     width: 200,
     height: 200
+  },
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover', // or 'stretch'
+    width: null,
+    height: null,
   }
 });

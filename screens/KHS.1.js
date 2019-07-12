@@ -19,7 +19,6 @@ import AnimatedLoader from "react-native-animated-loader";
 import Customrowkhs from '../constants/Customrowkhs';
 import Customrowkhp from '../constants/Customrowkhp';
 import Colors from '../constants/Colors';
-import { TabView, SceneMap } from 'react-native-tab-view';
 
 
 const CustomListview = ({ itemList }) => (
@@ -64,65 +63,24 @@ const CustomListviewPAS = ({ itemList }) => (
   </View>
 );
 
-const FirstRoute = ({ itemList }) => (
-  (itemList.length===0)?
-  <View>
-    <Text style={styles.bodyText}>
-      Data tidak tersedia
-    </Text>
-  </View>
-  :
-  <View>
-      <FlatList
-          data={itemList}
-          renderItem={({ item }) => <Customrowkhs
-              kodemk={item.kodemk}
-              namamk={item.namamk}
-              sks= {'SKS : ' + item.sks}
-              nilai={'Nilai : ' + item.nilaiangka + ' ('+item.nilaihuruf+')'}
-          />}
-      />
-  </View>
-);
+let data = [
+  {key: 'KHS', name: 'KHS', image: 'log-in'},
+  {key: 'KHP', name: 'KHP', image: 'log-out'},
+  {key: 'PAS', name: 'PAS', image: 'log-out'},
+];
+const formatData = (data, numColumns) => {
+  const numberofFullRows = Math.floor(data.length / numColumns);
 
-const SecondRoute = ({ itemList }) => (
-  (itemList.length===0)?
-  <View>
-    <Text style={styles.bodyText}>
-      Data tidak tersedia
-    </Text>
-  </View>
-  :
-  <View>
-      <FlatList
-          data={itemList}
-          renderItem={({ item }) => <Customrowkhp
-              jenis={item.jenis}
-              nilai={item.nilai}
-              grade={item.grade}  
-          />}
-      />
-  </View>
-);
+  let numberofElementsLastRow = data.length - (numberofFullRows * numColumns);
+  while(numberofElementsLastRow !== numColumns && numberofElementsLastRow !==0){
+    data.push({key: `blank-${numberofElementsLastRow}`, empty: true});
+    numberofElementsLastRow = numberofElementsLastRow + 1;
+  }
 
-const ThirdRoute = ({ itemList }) => (
-  (itemList.length===0)?
-  <View>
-    <Text style={styles.bodyText}>
-      Data tidak tersedia
-    </Text>
-  </View>
-  :
-  <View>
-      <FlatList
-          data={itemList}
-          renderItem={({ item }) => <Customrowkhp
-              jenis={item.jenis}
-              nilai={item.nilai}
-          />}
-      />
-  </View>
-);
+  return data;
+};
+
+const numColumns = 3;
 
 export default class DataTaruna extends React.Component {
   static navigationOptions = {
@@ -134,7 +92,9 @@ export default class DataTaruna extends React.Component {
   
     this.state = {
       isLoading:false,
-      isshow:false,
+      isshowkhs:false,
+      isshowkhp:false,
+      isshowpas:false,
       periode: '',
       idx_periode: '',
       list_periode:  [],
@@ -154,12 +114,6 @@ export default class DataTaruna extends React.Component {
         "jenis": "",
         "nilai": "",
       },],
-      index: 0,
-      routes: [
-        { key: 'khs', title: 'KHS' },
-        { key: 'khp', title: 'KHP' },
-        { key: 'pas', title: 'PAS' },
-      ],
       };
   }
 
@@ -228,12 +182,12 @@ export default class DataTaruna extends React.Component {
         if(responseJSON.message=="Success"){
           //this.setState({data: responseJSON.data});
           global.Variable.DATA_KHS = responseJSON.data;
-          this.setState({ data_khs: global.Variable.DATA_KHS.khs, data_khp :  global.Variable.DATA_KHS.khp, data_pas :  global.Variable.DATA_KHS.pas });
-          this.setState({ isshow: true });
+          this.setState({ data_khs: global.Variable.DATA_KHS.khs, data_khp : '', data_pas : '' });
+          this.setState({ isshowkhs: true });
           
         }else{
           //Alert.alert(responseJSON.message);
-          this.setState({ isshow: false });
+          this.setState({ isshowkhs: false });
         }
         this.hideLoader();
     }
@@ -244,6 +198,31 @@ export default class DataTaruna extends React.Component {
     }
   }
   
+  renderItem = ({item, index}) =>{
+    if(item.empty===true){
+      return <View style={[styles.item, styles.itemInvisible]} />;
+    }
+    return(
+      <TouchableOpacity style={styles.item} onPress={()=>
+        {
+          if(item.key=='KHS'){
+            this.setState({ data_khs: global.Variable.DATA_KHS.khs, data_khp : '', data_pas : '' });
+            this.setState({ isshowkhs: true, isshowkhp: false, isshowpas: false });
+          }else  if(item.key=='KHP'){
+            this.setState({ data_khs: '', data_khp : global.Variable.DATA_KHS.khp, data_pas : '' });
+            this.setState({ isshowkhs: false, isshowkhp: true, isshowpas: false });
+          }else  if(item.key=='PAS'){
+            this.setState({ data_khs: '', data_khp : '', data_pas : global.Variable.DATA_KHS.pas });
+            this.setState({ isshowkhs: false, isshowkhp: false, isshowpas: true });
+          }else{
+            Alert.alert(item.key)
+          }
+        }
+      }>
+        <Text style={styles.itemText}>{item.name}</Text>
+      </TouchableOpacity>
+    )
+  }
 
   render() {
     
@@ -285,16 +264,28 @@ export default class DataTaruna extends React.Component {
           <Text style={styles.bodyText}>Pilih Periode</Text>
           {renderModalStatePicker()}
 
-          {this.state.isshow ? ( 
-          <TabView
-            navigationState={this.state}
-            renderScene={SceneMap({
-              khs: () => <FirstRoute itemList={this.state.data_khs}/>,
-              khp: () => <SecondRoute itemList={this.state.data_khp}/>,
-              pas: () => <ThirdRoute itemList={this.state.data_pas}/>,
-            })}
-            onIndexChange={index => this.setState({ index })}
-            initialLayout={{ width: Dimensions.get('window').width }}
+          <FlatList 
+            data={formatData(data, numColumns)}
+            style={styles.fl}
+            renderItem={this.renderItem}
+            numColumns={numColumns}
+            keyExtractor = {(item, index)=> item.key} />
+
+          {this.state.isshowkhs ? (    
+            <CustomListview 
+              itemList={this.state.data_khs}
+            />
+          ) : null}
+
+          {this.state.isshowkhp ? ( 
+          <CustomListviewKHP 
+            itemList={this.state.data_khp}
+          />
+          ) : null}
+
+          {this.state.isshowpas ? ( 
+          <CustomListviewPAS 
+            itemList={this.state.data_pas}
           />
           ) : null}
 
@@ -378,8 +369,5 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     fontSize: 15,
-  },
-  scene: {
-    flex: 1,
   },
 });

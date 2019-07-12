@@ -36,7 +36,7 @@ KHSStack.navigationOptions = {
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
-      name={Platform.OS === 'ios' ? 'ios-information-circle' : 'md-information-circle'}
+      name={Platform.OS === 'ios' ? 'ios-folder' : 'md-folder'}
     />
   ),
 };
@@ -50,7 +50,7 @@ JadwalStack.navigationOptions = {
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
-      name={Platform.OS === 'ios' ? 'ios-swap' : 'md-swap'}
+      name={Platform.OS === 'ios' ? 'ios-clock' : 'md-clock'}
     />
   ),
 };
@@ -78,7 +78,7 @@ TranskripStack.navigationOptions = {
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
-      name={Platform.OS === 'ios' ? 'ios-home' : 'md-home'}
+      name={Platform.OS === 'ios' ? 'ios-clipboard' : 'md-clipboard'}
     />
   ),
 };

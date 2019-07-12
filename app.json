@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "MandiriEduMobile",
-    "slug": "MandiriEduMobile",
+    "name": "EduMobile",
+    "slug": "EduMobile",
     "privacy": "public",
     "sdkVersion": "33.0.0",
     "platforms": [
@@ -23,7 +23,11 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.spin.edumobile"
+    },
+    "android": {
+      "package": "com.spin.edumobile"
     }
   }
 }

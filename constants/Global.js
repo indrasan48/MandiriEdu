@@ -6,5 +6,6 @@ export default {
     },
     AUTH: {},
     DATA_TARUNA: {},
-    LIST_PERIODE: {},
+    DATA_KHS: {},
+    DATA_MIX: {},
 };
