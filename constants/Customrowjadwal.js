@@ -11,7 +11,19 @@ const styles = StyleSheet.create({
         marginTop: 8,
         marginBottom: 8,
         borderRadius: 5,
-        backgroundColor: '#FFF',
+        backgroundColor: '#F2F2F2',
+        elevation: 2,
+    },
+    container2: {
+        flex: 1,
+        flexDirection: 'row',
+        padding: 10,
+        marginLeft:16,
+        marginRight:16,
+        marginTop: 8,
+        marginBottom: 8,
+        borderRadius: 5,
+        backgroundColor: '#BFBFBF',
         elevation: 2,
     },
     title: {
@@ -39,8 +51,8 @@ const styles = StyleSheet.create({
     },
 });
 
-const Customrow = ({ hari, tgl, mulai, selesai, jenis, kuliah, materi, ruang, }) => (
-    <View style={styles.container}>
+const Customrow = ({ hari, tgl, mulai, selesai, jenis, kuliah, materi, ruang, color}) => (
+    <View style={color % 2 === 0 ? styles.container : styles.container2}>
         <View style={styles.container_text}>
             <Text style={styles.description}>
                 {hari + ', ' + tgl}

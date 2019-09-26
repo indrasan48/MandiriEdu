@@ -8,7 +8,6 @@ import { Text, Image, TouchableWithoutFeedback,
 import FormData from 'FormData';
 import { createStackNavigator } from 'react-navigation';
 import AnimatedLoader from "react-native-animated-loader";
-import * as SecureStore from 'expo-secure-store';
 
 
 export default class SignInScreen extends React.Component {
@@ -26,72 +25,15 @@ export default class SignInScreen extends React.Component {
           DeviceIMEI: '',
           userid: '1401001',
           password: '03081996',
-          email: '',
       }
-    }
-
-    componentDidMount() {
-      this.firstLaunchCheck();
-    }
-
-    firstLaunchCheck = () => {
-      SecureStore.getItemAsync('email').then(value => {
-        console.log("email " + value);
-
-        if (value === null) {
-          //SecureStore.setItemAsync('notFirstLaunch', 'true');         
-          this.props.navigation.navigate('Register');
-        }else{
-          this.setState({email: value});
-        }
-        //this.setState({notFirstLaunch: value === 'true'})
-      });
     }
 
     showLoader = () => {
       this.setState({ isLoading: true });
     };
-
     hideLoader = () => {
       this.setState({ isLoading: false });
     };
-
-    _signInLicense = async () => {
-      this.showLoader();
-      let formData = new FormData();
-      formData.append('email', this.state.email);
-
-      let data = {
-          method: 'POST',
-          headers: {
-              'Accept': 'application/json',
-              'SECRETKEY': global.Variable.SECRET_KEY,
-              'Content-Type': 'multipart/form-data',
-              'X-Requested-With': 'XMLHttpRequest',
-          },
-          body: formData
-      }
-      try {
-          const response = await fetch(global.Variable.LINK_LICENSE + 'auth/login', data);
-          const responseJSON = await response.json();
-          this.setState({
-              //isLoading: false,
-              dataSource: responseJSON,
-          });
-          //await AsyncStorage.setItem('access_token', responseJSON.access_token);
-          if(responseJSON.message == "Success"){
-            this._signInAsync();
-          }else{
-            Alert.alert("Error", responseJSON.message);
-          }
-          this.hideLoader();
-      }
-      catch (error) {
-          console.log(error);
-          this.hideLoader();
-          Alert.alert(error.toString());
-      }
-    }
   
     _signInAsync = async () => {
       this.showLoader();
@@ -129,7 +71,7 @@ export default class SignInScreen extends React.Component {
       catch (error) {
           console.log(error);
           this.hideLoader();
-          Alert.alert("Error", "Terjadi kesalahan koneksi. Silakan ulangi beberapa saat lagi.");
+          Alert.alert(error.toString());
       }
     }
 
@@ -155,7 +97,8 @@ export default class SignInScreen extends React.Component {
               <ImageBackground source={require('../images/background.jpeg')} style={styles.backgroundImage} >
               <View style={styles.container}>
                 <View style={styles.logoContainer}>
-                  <Image style={styles.logo} source={require('../images/edu_mobile.png')}/>
+                  <Image style={styles.logo} source={require('../images/appicon.gif')}/>
+                  <Text style={styles.title}>Education Mobile</Text>       
                   <Text style={styles.title2}>Supported by Bank Mandiri</Text>             
                 </View>
                 <AnimatedLoader
@@ -181,41 +124,31 @@ export default class SignInScreen extends React.Component {
             <ImageBackground source={require('../images/background.jpeg')} style={styles.backgroundImage} >
               <View style={styles.container}>
                 <View style={styles.logoContainer}>
-                  <Image style={styles.logo} source={require('../images/edu_mobile.png')}/>
+                  <Image style={styles.logo} source={require('../images/appicon.gif')}/>
+                  <Text style={styles.title}>Education Mobile</Text>       
                   <Text style={styles.title2}>Supported by Bank Mandiri</Text>         
                 </View>
 
                 <View style={styles.infoContainer}>
-                  <View style={styles.inputContainer}>
-                    <Image style={styles.inputIcon} source={require('../images/user.png')} />
                     <TextInput style={styles.input} 
                         placeholder="Userid"
                         placeholderTextColor='black'
                         keyboardType='number-pad'
                         returnKeyType='next'
                         autoCorrect={false}
-                        editable={true}
                         onSubmitEditing={()=> this.refs.txtPassword.focus()}
                         onChangeText={userid => this.setState({userid})}
                         >{this.state.userid}</TextInput>
-                  </View>
 
-                  <View style={styles.inputContainer}>
-                    <Image style={styles.inputIcon} source={require('../images/password.png')} />
                     <TextInput style={styles.input} 
                         placeholder="Password"
                         placeholderTextColor='black'
                         keyboardType='default'
                         secureTextEntry={true}
                         autoCorrect={false}
-                        editable={true}
                         ref={"txtPassword"}
                         onChangeText={password => this.setState({password})}
-                        >{this.state.password}</TextInput>   
-                  </View>
-                    
-
-                     
+                        >{this.state.password}</TextInput>    
 
                     <TouchableOpacity style={styles.buttonContainer} onPress={this._signInAsync} >
                       <Text style={styles.buttonText}>LOGIN</Text>
@@ -230,6 +163,7 @@ export default class SignInScreen extends React.Component {
         );
       }
     }
+  
   }
 
   
@@ -243,32 +177,14 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     backgroundColor: 'transparent',
   },
-  inputContainer: {
-    backgroundColor: '#fff',
-    color: '#000',
-    paddingHorizontal : 10,
-    marginBottom: 10,
-    borderColor: '#000',
-    borderWidth: 1,
-    shadowColor: '#f00',
-    shadowOffset: { width: 1, height: 3 },
-    shadowOpacity: 1,
-    shadowRadius: 5,
-    elevation: 3,
-    height:45,
-    marginBottom:20,
-    flexDirection: 'row',
-    alignItems:'center'
-},
   logoContainer:{
-    paddingBottom: 100,
     alignItems: 'center',
     justifyContent: 'center',
     flex:1
   },
   logo:{
-    width:200,
-    height:200,
+    width:256,
+    height:112,
     resizeMode: 'contain'
   },
   title:{
@@ -282,7 +198,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   title2:{
-    color: '#002F63',
+    color: '#459EDA',
     fontSize: 12,
     textAlign: 'center',
     shadowColor: '#f00',
@@ -292,22 +208,26 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   infoContainer:{
+    position: 'absolute',
     left:0,
     right:0,
     bottom:0,
+    height:160,
     padding:20,
   },
   input:{
-    height:45,
-    marginLeft:16,
-    borderBottomColor: '#FFFFFF',
-    flex:1,
-  },
-  inputIcon:{
-    width:30,
     height:30,
-    marginLeft:15,
-    justifyContent: 'center'
+    backgroundColor: '#fff',
+    color: '#000',
+    paddingHorizontal : 10,
+    marginBottom: 10,
+    borderColor: '#000',
+    borderWidth: 1,
+    shadowColor: '#f00',
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 1,
+    shadowRadius: 5,
+    elevation: 3,
   },
   buttonContainer:{
     backgroundColor: '#459EDA',

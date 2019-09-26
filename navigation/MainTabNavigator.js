@@ -3,90 +3,73 @@ import { Platform } from 'react-native';
 import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
 
 import TabBarIcon from '../components/TabBarIcon';
-import DataTaruna from '../screens/DataTaruna';
-import KHS from '../screens/KHS';
-import Jadwal from '../screens/Jadwal';
-import Keuangan from '../screens/Keuangan';
-import Transkrip from '../screens/Transkrip';
+import Home from '../screens/Home';
+import Notification from '../screens/Notification';
+import Profile from '../screens/Profile';
 
-const DataTarunaStack = createStackNavigator({
+//------------- Menu STTD -------------------//
+import DataTaruna from '../sttd/DataTaruna';
+import KHS from '../sttd/KHS';
+import Jadwal from '../sttd/Jadwal';
+import JadwalDetail from '../sttd/JadwalDetail';
+import Keuangan from '../sttd/Keuangan';
+import Transkrip from '../sttd/Transkrip';
+
+const HomeStack = createStackNavigator({
+  Home: Home,
   DataTaruna: DataTaruna,
+  KHS: KHS,
+  Jadwal: Jadwal,
+  JadwalDetail: JadwalDetail,
+  Keuangan: Keuangan,
+  Transkrip: Transkrip,
 });
 
-DataTarunaStack.navigationOptions = {
-  tabBarLabel: 'Data Taruna',
+HomeStack.navigationOptions = {
+  tabBarLabel: 'Home',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
       name={
         Platform.OS === 'ios'
-          ? `ios-person${focused ? '' : '-outline'}`
-          : 'md-person'
+          ? `ios-home${focused ? '' : '-outline'}`
+          : 'md-home'
       }
     />
   ),
 };
 
-const KHSStack = createStackNavigator({
-  KHS: KHS,
+
+const NotificationStack = createStackNavigator({
+  Notification: Notification,
 });
 
-KHSStack.navigationOptions = {
-  tabBarLabel: 'KHS',
+NotificationStack.navigationOptions = {
+  tabBarLabel: 'Notification',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
-      name={Platform.OS === 'ios' ? 'ios-folder' : 'md-folder'}
+      name={Platform.OS === 'ios' ? 'ios-notifications' : 'md-notifications'}
     />
   ),
 };
 
-const JadwalStack = createStackNavigator({
-  Jadwal: Jadwal,
+const ProfileStack = createStackNavigator({
+  Profile: Profile,
 });
 
-JadwalStack.navigationOptions = {
-  tabBarLabel: 'Jadwal',
+ProfileStack.navigationOptions = {
+  tabBarLabel: 'Profile',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
-      name={Platform.OS === 'ios' ? 'ios-clock' : 'md-clock'}
-    />
-  ),
-};
-
-const KeuanganStack = createStackNavigator({
-  Keuangan: Keuangan,
-});
-
-KeuanganStack.navigationOptions = {
-  tabBarLabel: 'Keuangan',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={Platform.OS === 'ios' ? 'ios-card' : 'md-card'}
-    />
-  ),
-};
-
-const TranskripStack = createStackNavigator({
-  Transkrip: Transkrip,
-});
-
-TranskripStack.navigationOptions = {
-  tabBarLabel: 'Transkrip',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={Platform.OS === 'ios' ? 'ios-clipboard' : 'md-clipboard'}
+      name={Platform.OS === 'ios' ? 'ios-person' : 'md-person'}
     />
   ),
 };
 
 export default createBottomTabNavigator({
-  DataTarunaStack,
-  KHSStack,
-  JadwalStack,
-  KeuanganStack,
-  TranskripStack,
+  HomeStack,
+  NotificationStack,
+  ProfileStack,
 });

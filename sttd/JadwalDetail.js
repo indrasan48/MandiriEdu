@@ -16,12 +16,15 @@ import {
 } from 'react-native';
 import Colors from '../constants/Colors';
 import Customrowjadwal from '../constants/Customrowjadwal';
+import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
 
 const CustomListview = ({ itemList }) => (
-  <View>
+  
+  <View style={{paddingBottom:140}}>
       <FlatList
+          style={{ flexGrow: 1}}
           data={itemList}
-          renderItem={({ item }) => <Customrowjadwal
+          renderItem={({ item, index }) => <Customrowjadwal
               hari={item.hari}
               tgl={item.tgl}
               mulai={item.mulai}
@@ -30,34 +33,30 @@ const CustomListview = ({ itemList }) => (
               kuliah={item.kuliah}
               materi={item.materi}
               ruang={item.ruang}
+              color={index}
           />}
       />
 
   </View>
 );
 
-export default class Jadwal extends React.Component {
+export default class JadwalDetail extends React.Component {
   static navigationOptions = {
-    header: null,
+    navigationOptions: ({navigation}) => ({ 
+      headerLeft: <HeaderBackButton onPress={() => navigation.goBack(null)} />
+    })
   };
 
   constructor(props){
     super(props);
   
     this.state = {
-      isLoading:false,
-      isshow:false,
-      jadwal:[
-        {
-            "hari": "",
-            "tgl": "",
-            "mulai": "",
-            "selesai": "",
-            "jenis": "",
-            "kuliah": "",
-            "materi": "",
-            "ruang": ""
-        },],
+      isLoading : false,
+      isshow : true,
+      marked: null,
+      jadwal : global.Variable.DATA_JADWAL,
+      current_date : null,
+      current_periode : global.Variable.CURRENT_PERIODE,
       };
   }
 
@@ -69,9 +68,27 @@ export default class Jadwal extends React.Component {
   };
 
   async componentDidMount(){
+    //this.setState({list_periode : global.Variable.LIST_PERIODE, list_month : global.Variable.LIST_MONTH});
+    if(!global.Variable.DATA_TANGGAL[0]){
+      this.setState({current_date : this.state.current_periode.substring(0,4) + '-01-01'})
+    }else{
+      this.setState({current_date : global.Variable.DATA_TANGGAL[0]})
+    }
+    this.anotherFunc();
+  }
+
+  anotherFunc = () => {
+    var obj = global.Variable.DATA_TANGGAL.reduce((c, v) => Object.assign(c, {[v]: {marked: true, textColor: Colors.defaultBackground, dotColor: Colors.defaultBackground}}), {});
+    this.setState({ marked : obj});
+  }
+
+  selectdata = async () => {
+    console.log(this.state.periode + " --- " + this.state.month);
     this.showLoader();
     let formData = new FormData();
     formData.append('action', 'getJadwalSemester');
+    formData.append('idperiode', this.state.periode);
+    formData.append('bulan', this.state.month);
     formData.append('token', global.Variable.AUTH.token);
     let data = {
         method: 'POST',
@@ -89,7 +106,15 @@ export default class Jadwal extends React.Component {
         if(Colors.isdevelopment){console.log(JSON.stringify(responseJSON, null, 2))};
         if(responseJSON.message=="Success"){
           global.Variable.DATA_MIX = responseJSON.data;
-          this.setState({jadwal: responseJSON.data.jadwal, isshow: true});
+          
+          this.setState({jadwal: [], isshow: true});
+
+          Object.keys(responseJSON.data.jadwal).map((key) => {
+            console.log(responseJSON.data.jadwal[key]);
+            this.state.jadwal.push(responseJSON.data.jadwal[key]);
+          });
+
+          
           
         }else{
           Alert.alert(responseJSON.message);
@@ -104,7 +129,6 @@ export default class Jadwal extends React.Component {
   }
   
   render() {
-
     return (
       <View style={styles.container}>
         <View style={styles.headerrow}>
@@ -113,20 +137,42 @@ export default class Jadwal extends React.Component {
           </Text>
         </View>
         <View style={styles.bodyrow}>
-
+        <Calendar
+          style={styles.calendar}
+          current={this.state.current_date}
+          theme={{
+            calendarBackground: '#333248',
+            textSectionTitleColor: 'white',
+            dayTextColor: 'white',
+            todayTextColor: 'white',
+            selectedDayTextColor: 'red',
+            monthTextColor: 'white',
+            indicatorColor: 'white',
+            selectedDayBackgroundColor: '#333248',
+            arrowColor: 'white',
+            // textDisabledColor: 'red',
+            'stylesheet.calendar.header': {
+              week: {
+                marginTop: 5,
+                flexDirection: 'row',
+                justifyContent: 'space-around'
+              }
+            }
+          }}
+          markedDates={
+            this.state.marked
+          }
+          hideArrows={false}
+        />
+         
           {this.state.isshow ? ( 
-            <Text style={styles.bodyText}>
-              {'Periode             : ' + global.Variable.DATA_MIX.periode}
-            </Text>
-          ) : null}
-
-          {this.state.isshow ? ( 
-            <Text style={styles.bodyText}>
-              {'Semester/IPK  : ' + global.Variable.DATA_MIX.semmhs + '/' + global.Variable.DATA_MIX.ipk}
-            </Text>
-          ) : null}
-
-          {this.state.isshow ? ( 
+            (this.state.jadwal.length===0)?
+            <View>
+              <Text style={styles.bodyText}>
+                Data tidak tersedia
+              </Text>
+            </View>
+            :
             <CustomListview 
               itemList={this.state.jadwal}
             />
@@ -144,8 +190,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    marginTop:23,
   }, 
+  calendar: {
+    borderTopWidth: 1,
+    paddingTop: 5,
+    borderBottomWidth: 1,
+    borderColor: '#eee',
+    margin: 10,
+  },
   containerLogo: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -160,7 +212,7 @@ const styles = StyleSheet.create({
   bodyrow: {
     flex: 9,
     backgroundColor: "#fff",
-    paddingBottom:140,
+    paddingBottom:220,
   },
   headerText: {
     textAlign: 'center',
@@ -170,10 +222,8 @@ const styles = StyleSheet.create({
   },
   bodyText: {
     color: Colors.defaultBackground,
-    fontSize: 18,
-    margin: 20,
-    borderBottomColor: Colors.defaultBackground,
-    borderBottomWidth: 1,
+    fontSize: 20,
+    margin: 5,
   },
   buttonContainer:{
     backgroundColor: Colors.defaultBackground,

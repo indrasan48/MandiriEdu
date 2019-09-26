@@ -75,11 +75,12 @@ const FirstRoute = ({ itemList }) => (
   <View>
       <FlatList
           data={itemList}
-          renderItem={({ item }) => <Customrowkhs
+          renderItem={({ item, index }) => <Customrowkhs
               kodemk={item.kodemk}
               namamk={item.namamk}
               sks= {'SKS : ' + item.sks}
               nilai={'Nilai : ' + item.nilaiangka + ' ('+item.nilaihuruf+')'}
+              color={index}
           />}
       />
   </View>
@@ -96,16 +97,17 @@ const SecondRoute = ({ itemList }) => (
   <View>
       <FlatList
           data={itemList}
-          renderItem={({ item }) => <Customrowkhp
+          renderItem={({ item, index }) => <Customrowkhp
               jenis={item.jenis}
               nilai={item.nilai}
               grade={item.grade}  
+              color={index}
           />}
       />
   </View>
 );
 
-const ThirdRoute = ({ itemList }) => (
+const ThirdRoute = ({ itemList}) => (
   (itemList.length===0)?
   <View>
     <Text style={styles.bodyText}>
@@ -116,9 +118,10 @@ const ThirdRoute = ({ itemList }) => (
   <View>
       <FlatList
           data={itemList}
-          renderItem={({ item }) => <Customrowkhp
+          renderItem={({ item, index  }) => <Customrowkhp
               jenis={item.jenis}
               nilai={item.nilai}
+              color={index}
           />}
       />
   </View>
@@ -126,7 +129,9 @@ const ThirdRoute = ({ itemList }) => (
 
 export default class DataTaruna extends React.Component {
   static navigationOptions = {
-    header: null,
+    navigationOptions: ({navigation}) => ({ 
+      headerLeft: <HeaderBackButton onPress={() => navigation.goBack(null)} />
+    })
   };
 
   constructor(props){
@@ -161,6 +166,40 @@ export default class DataTaruna extends React.Component {
         { key: 'pas', title: 'PAS' },
       ],
       };
+  }
+
+  async componentDidMount(){
+    
+    if(global.Variable.LIST_PERIODE==null){
+      let formData = new FormData();
+      formData.append('action', 'getListPeriode');
+      formData.append('token', global.Variable.AUTH.token);
+      let data = {
+          method: 'POST',
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'multipart/form-data',
+              'X-Requested-With': 'XMLHttpRequest',
+              'SECRETKEY': global.Variable.SECRET_KEY,
+          },
+          body: formData
+      }
+      try {
+          const response = await fetch(global.Variable.LINK_WS, data);
+          const responseJSON = await response.json();
+          if(Colors.isdevelopment){console.log(JSON.stringify(responseJSON, null, 2))};
+          if(responseJSON.message=="Success"){
+            global.Variable.LIST_PERIODE = responseJSON.data.periode;
+            
+          }else{
+            Alert.alert(responseJSON.message);
+          }
+      }
+      catch (error) {
+          if(Colors.isdevelopment){console.log(error)};
+          Alert.alert(error.toString());
+      }
+    }
   }
 
 
@@ -311,7 +350,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    marginTop:23,
   }, 
   headerrow: {
     flex: 1,

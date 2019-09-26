@@ -21,9 +21,10 @@ const CustomListview = ({ itemList }) => (
   <View style={styles.container}>
       <FlatList
           data={itemList}
-          renderItem={({ item }) => <Customrow
+          renderItem={({ item, index }) => <Customrow
               title={item.title}
               description={item.description}
+              color={index}
           />}
       />
 
@@ -79,8 +80,9 @@ export default class DataTaruna extends React.Component {
         if(Colors.isdevelopment){console.log(JSON.stringify(responseJSON, null, 2))};
         if(responseJSON.message=="Success"){
           global.Variable.DATA_TARUNA = responseJSON.data;
-          this.setState({data:  [{title: 'NIM', description: global.Variable.DATA_TARUNA.nim},
-            {title: 'Nama', description: global.Variable.DATA_TARUNA.nama},
+          this.setState({data:  [
+            /*{title: 'NIM', description: global.Variable.DATA_TARUNA.nim},
+            {title: 'Nama', description: global.Variable.DATA_TARUNA.nama},*/
             {title: 'Fakultas', description: global.Variable.DATA_TARUNA.fakultas},
             {title: 'Program Studi', description: global.Variable.DATA_TARUNA.prodi},
             {title: 'Jurusan', description: global.Variable.DATA_TARUNA.jurusan},
@@ -107,18 +109,15 @@ export default class DataTaruna extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-      <View style={styles.headerrow}>
-        <Text style={styles.headerText}>
-          Data Taruna
-        </Text>
-      </View>
       <View style={styles.bodyrow}>
 
         <View style={styles.containerLogo}>
           <Image
-            style={{width: 200, height: 200}}
+            style={{width: 150, height: 150}}
             source={require('../images/profile.png')} 
           />
+          {global.Variable.AUTH.nim ? <Text style={styles.title2}>{global.Variable.AUTH.nim}</Text>    : null}
+          {global.Variable.AUTH.nama ? <Text style={styles.title2}>{global.Variable.AUTH.nama}</Text>    : null}
         </View>
         {(this.state.data) &&
           <CustomListview
@@ -138,24 +137,23 @@ export default class DataTaruna extends React.Component {
     //await AsyncStorage.clear();
     this.props.navigation.navigate('Auth');
   };
-
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    marginTop:23,
   }, 
   containerLogo: {
     justifyContent: 'center',
     alignItems: 'center',
+    paddingTop:23,
+    backgroundColor: Colors.defaultBackground,
   },
   headerrow: {
     flex: 1,
     backgroundColor: Colors.defaultBackground,
     alignItems: 'center',
-    flexDirection: 'row',
     justifyContent: 'center',
   },
   bodyrow: {
@@ -178,5 +176,16 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight : 'bold',
     fontSize: 18
+  },
+  title2:{
+    color: 'white',
+    fontSize: 18,
+    textAlign: 'center',
+    shadowColor: '#f00',
+    shadowOffset: { width: 1, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 3,
+    elevation: 3,
+    margin:5,
   },
 });

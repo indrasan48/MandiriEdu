@@ -21,12 +21,13 @@ const CustomListview = ({ itemList }) => (
   <View>
       <FlatList
           data={itemList}
-          renderItem={({ item }) => <Customrowkeuangan
+          renderItem={({ item, index }) => <Customrowkeuangan
               periodetagihan={item.periodetagihan}
               jenistagihan={item.jenistagihan}
               jumlahtagihan={item.jumlahtagihan}
               jumlahbayar={item.jumlahbayar}
               status={item.status}
+              color={index}
           />}
       />
 
@@ -35,7 +36,9 @@ const CustomListview = ({ itemList }) => (
 
 export default class Keuangan extends React.Component {
   static navigationOptions = {
-    header: null,
+    navigationOptions: ({navigation}) => ({ 
+      headerLeft: <HeaderBackButton onPress={() => navigation.goBack(null)} />
+    })
   };
 
   constructor(props){
@@ -44,6 +47,9 @@ export default class Keuangan extends React.Component {
     this.state = {
       isLoading:false,
       isshow:false,
+      periode: '',
+      idx_periode: '',
+      list_periode:  [],
       tagihan:[],
       };
   }
@@ -54,11 +60,46 @@ export default class Keuangan extends React.Component {
   hideLoader = () => {
     this.setState({ isLoading: false });
   };
-
+  
   async componentDidMount(){
+    
+    if(global.Variable.LIST_PERIODE==null){
+      let formData = new FormData();
+      formData.append('action', 'getListPeriode');
+      formData.append('token', global.Variable.AUTH.token);
+      let data = {
+          method: 'POST',
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'multipart/form-data',
+              'X-Requested-With': 'XMLHttpRequest',
+              'SECRETKEY': global.Variable.SECRET_KEY,
+          },
+          body: formData
+      }
+      try {
+          const response = await fetch(global.Variable.LINK_WS, data);
+          const responseJSON = await response.json();
+          if(Colors.isdevelopment){console.log(JSON.stringify(responseJSON, null, 2))};
+          if(responseJSON.message=="Success"){
+            global.Variable.LIST_PERIODE = responseJSON.data.periode;
+            
+          }else{
+            Alert.alert(responseJSON.message);
+          }
+      }
+      catch (error) {
+          if(Colors.isdevelopment){console.log(error)};
+          Alert.alert(error.toString());
+      }
+    }
+  }
+
+  selectdata = async () => {
     this.showLoader();
     let formData = new FormData();
     formData.append('action', 'getListTagihan');
+    formData.append('idperiode', this.state.periode.toString());
     formData.append('token', global.Variable.AUTH.token);
     let data = {
         method: 'POST',
@@ -91,6 +132,28 @@ export default class Keuangan extends React.Component {
   }
   
   render() {
+    renderModalStatePicker = () => {
+      const pickerItems = Object.keys(global.Variable.LIST_PERIODE).map((key) => {
+          let id = Object.keys(global.Variable.LIST_PERIODE[key]);
+          let val = global.Variable.LIST_PERIODE[key][Object.keys(global.Variable.LIST_PERIODE[key])];
+          return (<Picker.Item label={val} value={id.toString()} key={key}/>)
+          
+      })     
+      pickerItems.unshift(<Picker.Item key="" label="Pilih Periode" value="" />)
+
+      return(
+          <View>
+              <Picker
+                  placeholder="Pilih Periode"
+                  selectedValue={this.state.periode.toString()}
+                  onValueChange={(itemValue, index) =>
+                    this.setState({periode: itemValue.toString(), idx_periode:index})
+                  }>
+                  {pickerItems}
+                </Picker>
+          </View>
+      );
+    }
 
     return (
       <View style={styles.container}>
@@ -101,19 +164,21 @@ export default class Keuangan extends React.Component {
         </View>
         <View style={styles.bodyrow}>
 
-          {this.state.isshow ? ( 
-            <Text style={styles.bodyText}>
-              {'Periode             : ' + global.Variable.DATA_MIX.periode}
-            </Text>
-          ) : null}
+          <Text style={styles.bodyText}>Pilih Periode</Text>
+          {renderModalStatePicker()}
+
+          <TouchableOpacity style={styles.buttonContainer} onPress={this.selectdata} >
+              <Text style={styles.buttonText}>Submit</Text>
+          </TouchableOpacity>
 
           {this.state.isshow ? ( 
-            <Text style={styles.bodyText}>
-              {'Semester/IPK  : ' + global.Variable.DATA_MIX.semmhs + '/' + global.Variable.DATA_MIX.ipk}
-            </Text>
-          ) : null}
-
-          {this.state.isshow ? ( 
+            (this.state.tagihan.length===0)?
+            <View>
+              <Text style={styles.bodyText}>
+                Data tidak tersedia
+              </Text>
+            </View>
+            :
             <CustomListview 
               itemList={this.state.tagihan}
             />
@@ -131,7 +196,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    marginTop:23,
   }, 
   containerLogo: {
     justifyContent: 'center',
@@ -157,10 +221,8 @@ const styles = StyleSheet.create({
   },
   bodyText: {
     color: Colors.defaultBackground,
-    fontSize: 18,
-    margin: 20,
-    borderBottomColor: Colors.defaultBackground,
-    borderBottomWidth: 1,
+    fontSize: 20,
+    margin: 5,
   },
   buttonContainer:{
     backgroundColor: Colors.defaultBackground,

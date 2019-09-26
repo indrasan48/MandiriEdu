@@ -11,12 +11,25 @@ const styles = StyleSheet.create({
         marginTop: 8,
         marginBottom: 8,
         borderRadius: 5,
-        backgroundColor: '#FFF',
+        backgroundColor: '#F2F2F2',
+        elevation: 2,
+    },
+    container2: {
+        flex: 1,
+        flexDirection: 'row',
+        padding: 10,
+        marginLeft:16,
+        marginRight:16,
+        marginTop: 8,
+        marginBottom: 8,
+        borderRadius: 5,
+        backgroundColor: '#BFBFBF',
         elevation: 2,
     },
     title: {
         fontSize: 12,
         fontStyle: 'italic',
+        color: '#000',
     },
     container_text: {
         flex: 1,
@@ -39,8 +52,8 @@ const styles = StyleSheet.create({
     },
 });
 
-const Customrow = ({ kodemk, namamk, semester, sks, grade, bobot}) => (
-    <View style={styles.container}>
+const Customrow = ({ kodemk, namamk, semester, sks, grade, bobot, color}) => (
+    <View style={color % 2 === 0 ? styles.container : styles.container2}>
         <View style={styles.container_text}>
             <Text style={styles.title}>
                 {kodemk}
